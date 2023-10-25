@@ -30,11 +30,11 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_CHANNEL: devops
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_MESSAGE: 'Failed trivy scan. see uploaded report'
-          SLACK_TITLE: 'Scan Failed' 
+          SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+          SLACK_MESSAGE: 'Post Content :rocket:'
+          SLACK_TITLE: Post Title
           SLACK_USERNAME: ${{ github.actor }}
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}.
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           
           
       # Docker Build and Push
