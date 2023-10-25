@@ -41,7 +41,7 @@ jobs:
         with:
           token: ${{ secrets.SLACK_TOKEN }}
           path: trivy-results.txt
-          channel: random
+          channel: devops
           
       # # Docker Build and Push
       # - name: Install Cosign
