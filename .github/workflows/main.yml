@@ -37,7 +37,26 @@ jobs:
             echo "::set-output name=vulnerabilities_found::true"
           fi
         shell: bash
-      
+
+      - name: Slack Fail Notification
+        if: ${{ steps.check-vulnerabilities.outputs.vulnerabilities_found == 'true' }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: test-submission
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_MESSAGE: 'Trivy scan failed. See uploaded report'
+          SLACK_TITLE: Scan failed
+          SLACK_USERNAME: ${{ github.actor }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Upload report to slack
+        if: ${{ steps.check-vulnerabilities.outputs.vulnerabilities_found == 'true' }}
+        uses: adrey/slack-file-upload-action@master
+        with:
+          token: ${{ secrets.SLACK_TOKEN }}
+          path: trivy-results.txt
+          channel: test-submission
+          
       # # Check the number of vulnerabilities found
       # - name: Check Trivy scan results
       #   id: scan-check
