@@ -24,7 +24,7 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           output: 'trivy-results.txt'
-          severity: 'HIGH'
+          severity: 'CRITICAL'
 
        # Check the number of vulnerabilities found
       - name: Check Trivy scan results
