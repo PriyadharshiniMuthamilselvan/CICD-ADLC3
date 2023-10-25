@@ -24,20 +24,23 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           output: 'trivy-results.txt'
-          severity: 'CRITICAL'
+          severity: 'HIGH'
 
-       # Check the number of vulnerabilities found
+      # Check the number of vulnerabilities found
       - name: Check Trivy scan results
         run: |
           vulnerabilities=$(cat trivy-results.txt | wc -l)
           if [[ $vulnerabilities -gt 0 ]]; then
             echo "Vulnerabilities found. Failing workflow."
-            exit 1
+            echo "export SCAN_CHECK=failure" >> $GITHUB_ENV
+          else
+            echo "No vulnerabilities found. Building image and sending success notification."
+            echo "export SCAN_CHECK=success" >> $GITHUB_ENV
           fi
           
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
-        if: ${{ steps.check-trivy-scan-results.outcome == 'failure' }}
+        if: ${{ env.SCAN_CHECK == 'failure' }}
         env:
           SLACK_CHANNEL: test-submission
           SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
@@ -48,7 +51,7 @@ jobs:
 
       - name: Upload to slack step
         uses: adrey/slack-file-upload-action@master
-        if: ${{ steps.check-trivy-scan-results.outcome == 'failure' }}
+        if: ${{ env.SCAN_CHECK == 'failure' }}
         with:
           token: ${{ secrets.SLACK_TOKEN }}
           path: trivy-results.txt
@@ -73,7 +76,7 @@ jobs:
       - name: Build and Push container images
         uses: docker/build-push-action@v5
         id: build-and-push
-        if: ${{ steps.check-trivy-scan-results.outcome == 'success' }}
+        if: ${{ env.SCAN_CHECK == 'success' }}
         with:
           context: .
           push: true
@@ -88,7 +91,7 @@ jobs:
 
       - name: Send Slack notification
         uses: rtCamp/action-slack-notify@v2
-        if: ${{ steps.check-trivy-scan-results.outcome == 'success' }}
+        if: ${{ env.SCAN_CHECK == 'success' }}
         env:
           SLACK_CHANNEL: test-submission
           SLACK_COLOR: ${{ job.status }}
