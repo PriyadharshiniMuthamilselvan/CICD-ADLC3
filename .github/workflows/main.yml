@@ -28,19 +28,17 @@ jobs:
 
       # Check the number of vulnerabilities found
       - name: Check Trivy scan results
+        id: scan-check
         run: |
           vulnerabilities=$(cat trivy-results.txt | wc -l)
           if [[ $vulnerabilities -gt 0 ]]; then
             echo "Vulnerabilities found. Failing workflow."
-            echo "export SCAN_CHECK=failure" >> $GITHUB_ENV
-          else
-            echo "No vulnerabilities found. Building image and sending success notification."
-            echo "export SCAN_CHECK=success" >> $GITHUB_ENV
+            exit 1
           fi
           
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
-        if: ${{ env.SCAN_CHECK == 'failure' }}
+        if: ${{ steps.scan-check.outcome == 'failure' }}
         env:
           SLACK_CHANNEL: test-submission
           SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
@@ -51,7 +49,7 @@ jobs:
 
       - name: Upload to slack step
         uses: adrey/slack-file-upload-action@master
-        if: ${{ env.SCAN_CHECK == 'failure' }}
+        if: ${{ steps.scan-check.outcome == 'failure' }}
         with:
           token: ${{ secrets.SLACK_TOKEN }}
           path: trivy-results.txt
@@ -63,14 +61,14 @@ jobs:
         
       - id: docker_meta
         uses: docker/metadata-action@v4.4.0
-        if: ${{ env.SCAN_CHECK == 'success' }}
+        if: ${{ steps.scan-check.outcome == 'success' }}
         with:
           images: priyadharshinimuthamil/fortune
           tags: type=sha,format=long
       
       - name: Login to Docker Hub
         uses: docker/login-action@v3
-        if: ${{ env.SCAN_CHECK == 'success' }}
+        if: ${{ steps.scan-check.outcome == 'success' }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -78,7 +76,7 @@ jobs:
       - name: Build and Push container images
         uses: docker/build-push-action@v5
         id: build-and-push
-        if: ${{ env.SCAN_CHECK == 'success' }}
+        if: ${{ steps.scan-check.outcome == 'success' }}
         with:
           context: .
           push: true
@@ -86,7 +84,7 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
 
       - name: Sign the images with GitHub OIDC Token
-        if: ${{ env.SCAN_CHECK == 'success' }}
+        if: ${{ steps.scan-check.outcome == 'success' }}
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
           TAGS: ${{ steps.docker_meta.outputs.tags }}
@@ -94,7 +92,7 @@ jobs:
 
       - name: Send Slack notification
         uses: rtCamp/action-slack-notify@v2
-        if: ${{ env.SCAN_CHECK == 'success' }}
+        if: ${{ steps.scan-check.outcome == 'success' }}
         env:
           SLACK_CHANNEL: test-submission
           SLACK_COLOR: ${{ job.status }}
