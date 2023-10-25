@@ -40,7 +40,7 @@ jobs:
         shell: bash
 
       - name: Slack Fail Notification
-        if: ${{ steps.check-vulnerabilities.outputs.vulnerabilities_found == 'true' }}
+        if: ${{ env.VULNERABILITIES_FOUND == 'true' }}
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_CHANNEL: test-submission
@@ -51,7 +51,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Upload report to slack
-        if: ${{ steps.check-vulnerabilities.outputs.vulnerabilities_found == 'true' }}
+        if: ${{ env.VULNERABILITIES_FOUND == 'true' }}
         uses: adrey/slack-file-upload-action@master
         with:
           token: ${{ secrets.SLACK_TOKEN }}
