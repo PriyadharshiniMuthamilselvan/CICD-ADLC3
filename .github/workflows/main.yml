@@ -1,8 +1,8 @@
 name: ADLC3
 on: 
   push:
-    tags:
-      - ^v\d+\.\d+$
+    # tags:
+    #   - ^v\d+\.\d+$
   workflow_dispatch:
   
 jobs:
@@ -15,6 +15,11 @@ jobs:
       id-token: write
       
     steps:
+      - name: Set exit code 1 and terminate workflow
+        if: ${{ ! startsWith(github.event.head_commit.message, '#NORUN') }}
+        run: |
+          exit 1
+          
       - name: Checkout
         uses: actions/checkout@v4.1.1
       
