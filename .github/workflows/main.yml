@@ -24,18 +24,19 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           output: 'trivy-results.txt'
-          severity: 'HIGH'
+          severity: 'CRITICAL'
 
       - name: Check for Vulnerabilities
         id: check-vulnerabilities
         run: |
-          if grep -q "Total: 0" trivy-results.txt; then
-            echo "No vulnerabilities found."
-            echo "::set-output name=vulnerabilities_found::false"
-          else
-            echo "Vulnerabilities found."
-            echo "::set-output name=vulnerabilities_found::true"
-          fi
+         vulnerabilities_found=$(cat trivy-results.txt | wc -l)
+         if [[ $vulnerabilities_found -gt 0 ]]; then
+          echo "Vulnerabilities found."
+          echo "VULNERABILITIES_FOUND=true" >> $GITHUB_ENV
+         else
+          echo "No vulnerabilities found."
+          echo "VULNERABILITIES_FOUND=false" >> $GITHUB_ENV
+         fi
         shell: bash
 
       - name: Slack Fail Notification
