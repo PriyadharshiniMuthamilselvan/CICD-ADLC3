@@ -31,8 +31,8 @@ jobs:
         env:
           SLACK_CHANNEL: devops
           SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
-          SLACK_MESSAGE: 'Post Content :rocket:'
-          SLACK_TITLE: Post Title
+          SLACK_MESSAGE: 'trivy scan failed see uploaded repoort'
+          SLACK_TITLE: Scan failed
           SLACK_USERNAME: ${{ github.actor }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           
