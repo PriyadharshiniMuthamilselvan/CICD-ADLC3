@@ -29,7 +29,7 @@ jobs:
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_CHANNEL: devops
+          SLACK_CHANNEL: test-submission
           SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
           SLACK_MESSAGE: 'trivy scan failed see uploaded repoort'
           SLACK_TITLE: Scan failed
@@ -41,7 +41,7 @@ jobs:
         with:
           token: ${{ secrets.SLACK_TOKEN }}
           path: trivy-results.txt
-          channel: devops
+          channel: test-submission
           
       # # Docker Build and Push
       # - name: Install Cosign
