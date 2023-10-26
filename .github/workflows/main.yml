@@ -46,7 +46,7 @@ jobs:
         if: ${{ env.VULNERABILITIES_FOUND == 'true' }}
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_CHANNEL: test-submission
+          SLACK_CHANNEL: submission
           SLACK_COLOR: ${{ job.status }}
           SLACK_MESSAGE: 'Trivy scan failed. See uploaded report'
           SLACK_TITLE: Scan failed
@@ -59,7 +59,7 @@ jobs:
         with:
           token: ${{ secrets.SLACK_TOKEN }}
           path: trivy-results.txt
-          channel: test-submission
+          channel: submission
           
       # Docker Build and Push
       - name: Install Cosign
@@ -97,7 +97,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         if: ${{ env.VULNERABILITIES_FOUND == 'false' }}
         env:
-          SLACK_CHANNEL: test-submission
+          SLACK_CHANNEL: submission
           SLACK_COLOR: ${{ job.status }}
           SLACK_MESSAGE: |
             Name: ${{ github.actor }}
