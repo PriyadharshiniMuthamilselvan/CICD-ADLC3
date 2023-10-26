@@ -27,7 +27,7 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           output: 'trivy-results.txt'
-          severity: 'CRITICAL'
+          severity: 'HIGH'
 
       - name: Check for Vulnerabilities
         id: check-vulnerabilities
@@ -100,11 +100,11 @@ jobs:
           SLACK_CHANNEL: test-submission
           SLACK_COLOR: ${{ job.status }}
           SLACK_MESSAGE: |
-            **Name:** ${{ github.actor }}
-            **Matriculation number:** A0285977B
-            **Email:** e1221789@u.nus.edu
-            **Repository:** "https://github.com/${{ github.repository }}"
-            **Docker Hub URL:** https://hub.docker.com/r/priyadharshinimuthamil/fortune
+            Name: ${{ github.actor }}
+            Matriculation number: A0285977B
+            Email: e1221789@u.nus.edu
+            Repository: https://github.com/${{ github.repository }}
+            Docker Hub URL: https://hub.docker.com/r/priyadharshinimuthamil/fortune
           SLACK_TITLE: Information
           SLACK_USERNAME: ${{ github.actor }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
