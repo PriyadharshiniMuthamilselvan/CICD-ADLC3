@@ -8,19 +8,14 @@ on:
 jobs:
   my-job:
     runs-on: ubuntu-latest
-    if: "!startsWith(github.event.head_commit.message, '#NORUN')"
+    if: ${{ ! startsWith(github.event.head_commit.message, '#NORUN') }}
     
     permissions:
       contents: read
       packages: write
       id-token: write
       
-    steps:
-      - name: Set exit code 1 and terminate workflow
-        if: ${{ ! startsWith(github.event.head_commit.message, '#NORUN') }}
-        run: |
-          exit 1
-          
+    steps:          
       - name: Checkout
         uses: actions/checkout@v4.1.1
       
@@ -32,7 +27,7 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           output: 'trivy-results.txt'
-          severity: 'CRITICAL'
+          severity: 'HIGH'
 
       - name: Check for Vulnerabilities
         id: check-vulnerabilities
